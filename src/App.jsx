@@ -10,7 +10,7 @@ import SenYakala from './assets/sen_yakala.webp';
 import DusenKafa from './assets/dusen_kafa.webp';
 
 // --- SUNUCU ADRESİ ---
-const API_BASE_URL = "http://localhost:3000";
+const API_BASE_URL = "https://aystun.onrender.com";
 
 // --- HAFIZA OYUNU ---
 const placeholderImages = [
