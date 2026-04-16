@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, MapPin, Smile, MessageCircle, Lock, ExternalLink, Globe, Film, PlaneTakeoff, Sparkles, CheckSquare, PlusCircle, FerrisWheel, RotateCcw, Camera, X, Upload, Music, Play, Trash2, Disc, Key, Home } from 'lucide-react';
+import {  Heart, MapPin, Smile, MessageCircle, Lock, ExternalLink, Globe, Film, PlaneTakeoff, Sparkles, CheckSquare, PlusCircle, FerrisWheel, RotateCcw, Camera, X, Upload, Music, Play, Trash2, Disc, Key, Home, Skull, Flag, Terminal, AlertTriangle, ShieldCheck, UserCheck } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
 // --- GÖRSELLER (WEBP VE PNG) ---
@@ -292,7 +292,221 @@ const KalpYakala = ({ onComplete }) => {
     </div>
   );
 };
-
+// --- AYSUN TARLASI (MAYIN TARLASI) ---
+const AYSUN_CONFIG = {
+  EASY:   { size: 8,  mines: 8,  label: "Yeni Tanışmışız" },
+  MEDIUM: { size: 10, mines: 18, label: "Ciddi İlişki" },
+  HARD:   { size: 12, mines: 35, label: "Sınav Haftasındaki Aysun" }
+};
+ 
+const SITEM_MESAJLARI = [
+  "Peki... (En tehlikeli kelime!)",
+  "Mesajıma neden 2 dakika geç cevap verdin? 😒",
+  "O kızı neden beğendin? (Şaka şaka ama basmasaydın iyiydi)",
+  "Yine mi oyun oynuyorsun sen?",
+  "Anladım, öyle olsun...",
+  "Kendi bilirsin."
+];
+ 
+const AysunTarlasi = ({ onComplete }) => {
+  const [difficulty, setDifficulty] = useState('EASY');
+  const [board, setBoard] = useState([]);
+  const [gameOver, setGameOver] = useState(false);
+  const [win, setWin] = useState(false);
+  const [logs, setLogs] = useState([]);
+  const [flagsUsed, setFlagsUsed] = useState(0);
+  const logEndRef = useRef(null);
+ 
+  const addLog = useCallback((msg, type = "info") => {
+    const time = new Date().toLocaleTimeString().split(' ')[0];
+    setLogs(prev => [...prev.slice(-15), { msg, type, time }]);
+  }, []);
+ 
+  const initBoard = useCallback(() => {
+    const { size, mines } = AYSUN_CONFIG[difficulty];
+    let newBoard = Array(size).fill(null).map(() =>
+      Array(size).fill(null).map(() => ({
+        isMine: false, revealed: false, flagged: false, neighborCount: 0
+      }))
+    );
+ 
+    let placedMines = 0;
+    while (placedMines < mines) {
+      const r = Math.floor(Math.random() * size);
+      const c = Math.floor(Math.random() * size);
+      if (!newBoard[r][c].isMine) { newBoard[r][c].isMine = true; placedMines++; }
+    }
+ 
+    for (let r = 0; r < size; r++) {
+      for (let c = 0; c < size; c++) {
+        if (newBoard[r][c].isMine) continue;
+        let count = 0;
+        for (let x = -1; x <= 1; x++) {
+          for (let y = -1; y <= 1; y++) {
+            const nr = r + x, nc = c + y;
+            if (nr >= 0 && nr < size && nc >= 0 && nc < size && newBoard[nr][nc].isMine) count++;
+          }
+        }
+        newBoard[r][c].neighborCount = count;
+      }
+    }
+ 
+    setBoard(newBoard);
+    setGameOver(false);
+    setWin(false);
+    setFlagsUsed(0);
+    setLogs([]);
+    addLog(`[SYSTEM]: ${AYSUN_CONFIG[difficulty].label} modu yüklendi.`, "success");
+    addLog("[INFO]: Duygusal veri seti parse ediliyor...");
+    addLog("[INFO]: Model Accuracy: %99.99 (Güzellik parametresi)");
+  }, [difficulty, addLog]);
+ 
+  useEffect(() => { initBoard(); }, [initBoard]);
+  useEffect(() => { logEndRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [logs]);
+ 
+  const handleReveal = (r, c) => {
+    if (gameOver || win || board[r][c].revealed || board[r][c].flagged) return;
+    let newBoard = board.map(row => row.map(cell => ({ ...cell })));
+ 
+    if (newBoard[r][c].isMine) {
+      setGameOver(true);
+      addLog(`[CRITICAL]: Hata! Sitem patladı: "${SITEM_MESAJLARI[Math.floor(Math.random() * SITEM_MESAJLARI.length)]}"`, "error");
+      return;
+    }
+ 
+    const floodFill = (row, col) => {
+      if (row < 0 || row >= AYSUN_CONFIG[difficulty].size || col < 0 || col >= AYSUN_CONFIG[difficulty].size) return;
+      if (newBoard[row][col].revealed || newBoard[row][col].isMine) return;
+      newBoard[row][col].revealed = true;
+      if (newBoard[row][col].neighborCount === 0) {
+        for (let x = -1; x <= 1; x++) for (let y = -1; y <= 1; y++) floodFill(row + x, col + y);
+      }
+    };
+ 
+    floodFill(r, c);
+    setBoard(newBoard);
+    addLog(`[DEBUG]: (${r},${c}) hücresi analiz edildi. Latent space güvenli.`);
+    checkWin(newBoard);
+  };
+ 
+  const handleFlag = (e, r, c) => {
+    e.preventDefault();
+    if (gameOver || win || board[r][c].revealed) return;
+    let newBoard = board.map(row => row.map(cell => ({ ...cell })));
+    const targetState = !newBoard[r][c].flagged;
+    newBoard[r][c].flagged = targetState;
+    setBoard(newBoard);
+    setFlagsUsed(prev => targetState ? prev + 1 : prev - 1);
+    addLog(`[WARNING]: (${r},${c}) hücresine kalp yerleştirildi.`);
+  };
+ 
+  const checkWin = (currentBoard) => {
+    const { mines } = AYSUN_CONFIG[difficulty];
+    let unrevealedCount = 0;
+    currentBoard.forEach(row => row.forEach(cell => { if (!cell.revealed) unrevealedCount++; }));
+    if (unrevealedCount === mines) {
+      setWin(true);
+      confetti({ particleCount: 200, spread: 70, origin: { y: 0.6 } });
+      addLog("[SUCCESS]: Global Optimum bulundu! Aysun'un kalbi fethedildi.", "success");
+      if (onComplete) onComplete();
+    }
+  };
+ 
+  const cellSize = difficulty === 'HARD' ? 28 : difficulty === 'MEDIUM' ? 32 : 35;
+ 
+  return (
+    <div style={{ display: 'flex', gap: '20px', alignItems: 'flex-start', justifyContent: 'center', padding: '10px', flexWrap: 'wrap' }}>
+      
+      {/* LOG TERMİNALİ */}
+      <div style={{ width: '240px', background: '#0d1117', borderRadius: '15px', padding: '12px', border: '1px solid #30363d', fontFamily: "'Courier New', monospace", fontSize: '10px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginBottom: '8px', color: '#8b949e', borderBottom: '1px solid #30363d', paddingBottom: '5px' }}>
+          <Terminal size={12} /> <span>AYSUN_LOG v1.0</span>
+        </div>
+        <div style={{ height: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {logs.map((log, i) => (
+            <div key={i} style={{ color: log.type === "error" ? "#ff7b72" : log.type === "success" ? "#7ee787" : "#d1d5da", lineHeight: '1.4' }}>
+              <span style={{ opacity: 0.5 }}>[{log.time}]</span> {log.msg}
+            </div>
+          ))}
+          <div ref={logEndRef} />
+        </div>
+      </div>
+ 
+      {/* OYUN ALANI */}
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ marginBottom: '12px', display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap' }}>
+          {Object.keys(AYSUN_CONFIG).map(lvl => (
+            <button key={lvl} onClick={() => setDifficulty(lvl)} style={{ padding: '6px 12px', border: 'none', borderRadius: '10px', cursor: 'pointer', background: difficulty === lvl ? '#f82f8d' : '#fff0f3', color: difficulty === lvl ? 'white' : '#f82f8d', fontSize: '11px', fontWeight: 'bold', transition: '0.3s' }}>
+              {lvl}
+            </button>
+          ))}
+        </div>
+ 
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${AYSUN_CONFIG[difficulty].size}, ${cellSize}px)`, gap: '3px', background: 'white', padding: '8px', borderRadius: '15px', boxShadow: '0 20px 50px rgba(248,47,141,0.1)', margin: '0 auto', width: 'fit-content' }}>
+          {board.map((row, r) => row.map((cell, c) => (
+            <motion.div
+              key={`${r}-${c}`}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => handleReveal(r, c)}
+              onContextMenu={(e) => handleFlag(e, r, c)}
+              style={{
+                width: `${cellSize}px`, height: `${cellSize}px`, borderRadius: '5px', cursor: 'pointer',
+                display: 'grid', placeItems: 'center',
+                fontSize: cellSize < 32 ? '11px' : '13px', fontWeight: 'bold',
+                background: cell.revealed ? (cell.isMine ? '#ff7b72' : '#f0f0f0') : (cell.flagged ? '#fff0f3' : '#e0e0e0'),
+                color: cell.neighborCount === 1 ? '#0969da' : cell.neighborCount === 2 ? '#1a7f37' : '#cf222e',
+                userSelect: 'none'
+              }}
+            >
+              {cell.revealed ? (
+                cell.isMine ? <Skull size={cellSize - 16} color="white" /> : (cell.neighborCount > 0 ? cell.neighborCount : "")
+              ) : (
+                cell.flagged ? <Heart size={cellSize - 18} fill="#f82f8d" color="#f82f8d" /> : ""
+              )}
+            </motion.div>
+          )))}
+        </div>
+ 
+        <button onClick={initBoard} style={{ marginTop: '15px', display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 18px', borderRadius: '25px', border: 'none', background: '#f82f8d', color: 'white', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', margin: '15px auto 0' }}>
+          <RotateCcw size={14} /> Yeniden Eğit (Restart)
+        </button>
+      </div>
+ 
+      {/* DURUM PANELİ */}
+      <div style={{ width: '180px', display: 'flex', flexDirection: 'column', gap: '12px', flexShrink: 0 }}>
+        <div style={{ background: 'white', padding: '15px', borderRadius: '20px', boxShadow: '0 10px 25px rgba(0,0,0,0.05)', textAlign: 'center' }}>
+          <h4 style={{ margin: '0 0 10px 0', color: '#f82f8d', fontSize: '13px' }}>Model Status</h4>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
+              <span>Kazanılan Gönül:</span>
+              <b style={{ color: '#f82f8d' }}>{win ? '∞' : '0'}</b>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
+              <span>Tespit Trip:</span>
+              <b>{flagsUsed} / {AYSUN_CONFIG[difficulty].mines}</b>
+            </div>
+          </div>
+        </div>
+ 
+        <AnimatePresence>
+          {(gameOver || win) && (
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{ padding: '15px', borderRadius: '20px', background: win ? '#7ee78722' : '#ff7b7222', border: `2px dashed ${win ? '#7ee787' : '#ff7b72'}`, textAlign: 'center' }}>
+              {win ? <ShieldCheck color="#1a7f37" size={32} /> : <AlertTriangle color="#cf222e" size={32} />}
+              <p style={{ fontSize: '11px', fontWeight: 'bold', marginTop: '8px', color: win ? '#1a7f37' : '#cf222e' }}>
+                {win ? "Model %100 doğrulandı!" : "Kritik Hata: Sitem patladı!"}
+              </p>
+            </motion.div>
+          )}
+        </AnimatePresence>
+ 
+        <div style={{ fontSize: '10px', color: '#aaa', fontStyle: 'italic', textAlign: 'center' }}>
+          * Yüksek oranda zeka, güzellik ve sitem içerir.
+        </div>
+      </div>
+    </div>
+  );
+};
 // --- NASA GÖKYÜZÜ ---
 const StarMap = () => {
   const [glitters, setGlitters] = useState([]);
@@ -752,7 +966,13 @@ function App() {
       </div>
     );
   }
-
+   const gameMenuItems = [
+    { key: 'hafiza', label: 'Hafıza' },
+    { key: 'yapboz',  label: 'Yapboz' },
+    { key: 'yakala',  label: 'Yakala' },
+    { key: 'tarlasi', label: 'Tarlası 💣' },
+  ];
+ 
   return (
     <div style={{ backgroundColor: '#fff5f7', minHeight: '100vh', width: '100%', position: 'relative', fontFamily: "'Quicksand', sans-serif", overflow: 'hidden' }}>
       <div className="sparkle-background" />
@@ -809,7 +1029,50 @@ function App() {
             {showReason && ( <div className="modal-fix-overlay" onClick={() => setShowReason(false)}><motion.div className="modal-fix-content" onClick={e => e.stopPropagation()}><h2 style={{ fontFamily: 'Dancing Script', color: '#f82f8d' }}>Neden Sen?</h2><p>{loveReasons[reasonIndex]}</p><button onClick={() => setReasonIndex((reasonIndex + 1) % loveReasons.length)} style={{ background: '#f82f8d', color: 'white', border: 'none', padding: '12px 25px', borderRadius: '25px', marginTop: '20px' }}>Başka Bir Neden ✨</button><X onClick={() => setShowReason(false)} style={{ position: 'absolute', top: '20px', right: '20px' }} /></motion.div></div> )}
             {showMapModal && ( <div className="modal-fix-overlay" onClick={() => setShowMapModal(false)}><motion.div className="modal-fix-content" onClick={e => e.stopPropagation()}><h2 style={{ fontFamily: 'Dancing Script' }}>İlk Buluştuğumuz Yer</h2><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3059.4475484838495!2d32.8538!3d39.9333!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzlCsDU2JzAwLjAiTiAzMsKwNTEnMTMuNyJF!5e0!3m2!1str!2str!4v1619000000000!5m2!1str!2str" width="100%" height="300px" style={{border:0, borderRadius: '25px'}}></iframe><X onClick={() => setShowMapModal(false)} style={{ position: 'absolute', top: '20px', right: '20px' }} /></motion.div></div> )}
             {showStressModal && ( <div className="modal-fix-overlay" onClick={() => setShowStressModal(false)}><motion.div className="modal-fix-content" onClick={e => e.stopPropagation()}><Smile size={50} color="#f82f8d" /><h2>Huzur Butonu</h2><p>Gözlerini kapat ve derin bir nefes al. Her zaman yanındayım. ❤️</p><button onClick={() => { confetti({ particleCount: 100 }); setShowStressModal(false); }} style={{ background: '#f82f8d', color: 'white', border: 'none', padding: '12px 25px', borderRadius: '25px', marginTop: '20px' }}>Rahatladım ✨</button></motion.div></div> )}
-            {showGameModal && ( <div className="modal-fix-overlay" onClick={() => setShowGameModal(false)}><motion.div className="modal-fix-content" onClick={e => e.stopPropagation()}><div style={{ display: 'flex', gap: '10px', justifyContent: 'center', marginBottom: '20px' }}>{['hafiza', 'yapboz', 'yakala'].map(g => <button key={g} onClick={() => setActiveGame(g)} style={{ padding: '8px 12px', border: 'none', borderRadius: '10px', background: activeGame === g ? '#f82f8d' : '#fff0f3', color: activeGame === g ? 'white' : '#f82f8d' }}>{g.toUpperCase()}</button>)}</div>{activeGame === 'hafiza' && <HafizaOyunu onComplete={() => confetti()} />}{activeGame === 'yapboz' && <Yapboz onComplete={() => confetti()} />}{activeGame === 'yakala' && <KalpYakala onComplete={() => confetti()} />}<X onClick={() => setShowGameModal(false)} style={{ position: 'absolute', top: '20px', right: '20px' }} /></motion.div></div> )}
+            {showGameModal && (
+              <div className="modal-fix-overlay" onClick={() => setShowGameModal(false)}>
+                <motion.div
+                  className="modal-fix-content"
+                  onClick={e => e.stopPropagation()}
+                  style={{
+                    maxWidth: activeGame === 'tarlasi' ? '900px' : '520px',
+                    width: '95vw',
+                    overflowY: 'auto',
+                    maxHeight: '90vh'
+                  }}
+                >
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginBottom: '20px', flexWrap: 'wrap' }}>
+                    {gameMenuItems.map(g => (
+                      <button
+                        key={g.key}
+                        onClick={() => setActiveGame(g.key)}
+                        style={{
+                          padding: '8px 14px',
+                          border: 'none',
+                          borderRadius: '12px',
+                          background: activeGame === g.key ? '#f82f8d' : '#fff0f3',
+                          color: activeGame === g.key ? 'white' : '#f82f8d',
+                          fontWeight: 'bold',
+                          cursor: 'pointer',
+                          fontSize: '12px',
+                          transition: '0.2s'
+                        }}
+                      >
+                        {g.label.toUpperCase()}
+                      </button>
+                    ))}
+                  </div>
+ 
+                  {activeGame === 'hafiza'  && <HafizaOyunu  onComplete={() => confetti()} />}
+                  {activeGame === 'yapboz'  && <Yapboz        onComplete={() => confetti()} />}
+                  {activeGame === 'yakala'  && <KalpYakala    onComplete={() => confetti()} />}
+                  {activeGame === 'tarlasi' && <AysunTarlasi  onComplete={() => confetti({ particleCount: 200, spread: 70 })} />}
+ 
+                  <X onClick={() => setShowGameModal(false)} style={{ position: 'absolute', top: '20px', right: '20px', cursor: 'pointer' }} />
+                </motion.div>
+              </div>
+            )}
+ 
             {showAniTreni && ( <div className="modal-fix-overlay" style={{ background: 'rgba(255, 255, 255, 0.98)' }} onClick={() => setShowAniTreni(false)}><motion.div className="modal-fix-content" style={{ maxWidth: '800px', height: '80vh', overflowY: 'auto' }} onClick={e => e.stopPropagation()}><h2>Anı Defterimiz</h2><form onSubmit={handleAddAni} style={{ marginBottom: '30px', display: 'flex', gap: '10px', justifyContent: 'center' }}><input type="file" ref={fileInputRef} style={{ display: 'none' }} /><button type="button" onClick={() => fileInputRef.current.click()}><Camera color="#f82f8d" /></button><input value={newNote} onChange={e => setNewNote(e.target.value)} placeholder="Not..." style={{ padding: '10px', borderRadius: '15px' }} /><button type="submit" style={{ background: '#f82f8d', color: 'white', border: 'none', borderRadius: '15px', padding: '0 20px' }}>Ekle</button></form><div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '20px' }}>{Array.isArray(memories) && memories.map(ani => (<div key={ani.id} style={{ background: 'white', padding: '10px', borderRadius: '10px', boxShadow: '0 5px 15px rgba(0,0,0,0.05)', position: 'relative' }}><Trash2 size={16} onClick={() => deleteMemory(ani.id)} style={{ position: 'absolute', top: '10px', right: '10px', color: '#ff8a8a', cursor: 'pointer', background: 'white', borderRadius: '50%', padding: '4px' }} /><img src={ani.img} style={{ width: '100%', borderRadius: '5px' }} alt="anı"/><p style={{ marginTop: '10px' }}>{ani.note}</p></div>))}</div><X onClick={() => setShowAniTreni(false)} style={{ position: 'absolute', top: '30px', right: '30px' }} /></motion.div></div> )}
             {showPassModal && ( <div className="modal-fix-overlay" onClick={() => setShowPassModal(false)}><motion.div className="modal-fix-content" onClick={e => e.stopPropagation()}><Lock size={40} color="#e2d9a2" /><h2 style={{ fontFamily: 'Dancing Script', color: '#856404' }}>Bu Kapı Kilitli...</h2><input type="password" value={password} onChange={(e) => { setPassword(e.target.value); if(e.target.value === correctPassword) { setShowLetter(true); setShowPassModal(false); setPassword(""); confetti(); } }} placeholder="****" style={{ padding: '15px', borderRadius: '15px', border: '2px solid #f0e4a5', textAlign: 'center', fontSize: '20px', width: '120px', marginTop: '20px' }} /><X onClick={() => setShowPassModal(false)} style={{ position: 'absolute', top: '20px', right: '20px' }} /></motion.div></div> )}
             {showLetter && ( <div className="modal-fix-overlay" style={{ background: 'rgba(0,0,0,0.4)' }} onClick={() => setShowLetter(false)}><motion.div initial={{ y: 100 }} animate={{ y: 0 }} className="modal-fix-content" style={{ maxWidth: '500px', background: '#fdfcf0', padding: '50px' }} onClick={e => e.stopPropagation()}><Heart size={50} fill="#f82f8d" style={{ marginBottom: '20px' }} /><h2>Sevgilim...</h2><div style={{ textAlign: 'left', lineHeight: '1.8', fontFamily: 'Quicksand' }}><p>Buraya kadar geldiysen, şifreyi yani bizi hiç unutmamışsın demektir...</p><p>Seninle geçen her gün hayatımın en güzel sayfası. İyi ki varsın, iyi ki benimsin. ❤️</p><br /><p style={{ textAlign: 'right', fontWeight: 'bold' }}>Seni Çok Seven, Aysun.</p></div><X onClick={() => setShowLetter(false)} style={{ position: 'absolute', top: '20px', right: '20px' }} /></motion.div></div> )}
