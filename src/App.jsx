@@ -732,7 +732,7 @@ const AskCarki = ({ memories }) => {
     const lastSpin = localStorage.getItem('lastSpinDate');
     if (lastSpin) {
       const diff = Date.now() - parseInt(lastSpin);
-      const aWeek =7 * 24 * 60 * 60 * 1000;
+      const aWeek =60 * 1000;
       if (diff < aWeek) {
         setCanSpin(false);
         const ms = aWeek - diff;
