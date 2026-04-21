@@ -729,7 +729,7 @@ const AskCarki = ({ memories }) => {
   }, [memories]);
   
   const colors = ["#FFADAD", "#FFD6A5", "#FDFFB6", "#CAFFBF", "#9BF6FF", "#A0C4FF", "#BDB2FF", "#FFC6FF", "#FFB5E8", "#D5AAFF"];
-  const rewards = ["Dilediğin Yemek 🍝", "Masaj 💆‍♂️","En Sevdiğin Tatlı 🍰", "1 Gün 'Evet' ✅", "Sınırsız Sarılma 🤗","Sabah Kahvaltısı Benden 🍳","Tunahan'dan Online Alışveriş Sepeti Onayı 🛒","Tunahan'dan yemek şov 🍰","Tunahan'a 1000 tl para cezası 🤗 ","Tunahan'dan masaj💆‍♂️","Dilediğin Yemek 🍝", "Masaj 💆‍♂️", "Komik Dans 💃","En Sevdiğin Tatlı 🍰", "1 Gün 'Evet' ✅", "Sınırsız Sarılma 🤗","Sabah Kahvaltısı Benden 🍳","Tunahan'dan Online Alışveriş Sepeti Onayı 🛒","Tunahan'dan yemek şov 🍰","Tunahan'dan masaj💆‍♂️"];
+  const rewards = ["Dilediğin Yemek 🍝","En Sevdiğin Tatlı 🍰", "1 Gün 'Evet' ✅"];
   const conicGradient = rewards.map((_, i) => `${colors[i % colors.length]} ${i * 18}deg ${(i + 1) * 18}deg`).join(', ');
 
   const checkSpinLimit = useCallback(() => {
@@ -965,7 +965,7 @@ function App() {
   // GÜNCELLEME: Global Giriş Şifresi State'i
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [entryPass, setEntryPass] = useState("");
-  const globalPassword = "210417";
+  const globalPassword = "........";
 
   const [started, setStarted] = useState(false);
   const [reasonIndex, setReasonIndex] = useState(0);
@@ -980,7 +980,7 @@ function App() {
   const [showPassModal, setShowPassModal] = useState(false);
   const [password, setPassword] = useState("");
   const [showLetter, setShowLetter] = useState(false);
-  const correctPassword = "şeftali"; 
+  const correctPassword = "......"; 
 
   const [memories, setMemories] = useState([]);
   const [newNote, setNewNote] = useState("");
@@ -993,44 +993,6 @@ function App() {
   const loveReasons = [
   "Gülüşündeki o eşsiz huzur.",
   "Dünyayı daha güzel bir yer yapma gücün.",
-  "Bana kendimi en değerli hissettiren bakışın.",
-  "İçimde çiçekler açtıran kokun...",
-  "Çinli Yazılımcı olman..",
-  "Benim tatlı öğretmenim olman...",
-  "Karmaşık bir kodu çözerken takındığın o aşırı odaklı yüz ifaden.",
-  "Başkalarına karşı ördüğün duvarların, benim yanımda şeffaflaşması.",
-  "Dünyayı kurtaracakmışız gibi ciddiyetle yaptığımız o uzun sohbetler.",
-  "En huysuz olduğum anlarda bile 'gel buraya' diyen sakinliğin.",
-  "Benim bile kendime inanmadığım anlarda bana olan sarsılmaz inancın.",
-  "'Hallederiz' dediğinde gerçekten halledeceğini bilmenin verdiği o güven.",
-  "Zayıf yanlarımı sana emanet edebilecek kadar seni kendimden saymam.",
-  "Kalbinin atışını kulağımda duyduğum o tarifsiz anlar.",
-  "Zorluklar karşısında 'biz bir ekibiz' diyen o duruşun.",
-  "Sadece sevgilim değil, aynı zamanda en güvenilir sırdaşım olman.",
-  "Varlığın, en büyük şükür sebebim.",
-  "Beni ben olduğum için, her şeyimle sevmen.",
-  "Ruhumun eksik parçasını sende tamamlamış olmam.",
-  "Karanlık çöktüğünde gökyüzümdeki tek yıldız olman.",
-  "Her 'günaydın' mesajında içimde çiçekler açtırman.",
-  "Hayatımın en güzel hikayesinin seninle başlaması.",
-  "Sadece yanımda olman bile her şeye yetiyor.",
-  "Ve sadece... Sen olduğun için. Başka hiçbir şeye gerek duymadan.",
-  "Paylaştığımız her anın paha biçilemez olması.",
-  "Benim en iyi arkadaşım ve en büyük aşkım olman.",
-  "Ruhuma dokunan tek insan olman.",
-  "Kalbinin kapılarını sonuna kadar bana açman.",
-  "Sabrın, anlayışın ve şefkatin.",
-  "Birlikte keşfettiğimiz her sokak.",
-  "Gece sisli havada seninle yolumu kaybettiğimde bile korkmayacak kadar güvende hissettiğim için.",
-  "Başarılarımla benden daha çok gurur duyman.",
-  "Beraber söylediğimiz şarkılar...",
-  "Beraber izlediğimiz filmlerdeki yorumların.",
-  "İzlediğimiz filmlerin sonunu hemen tahmin etmen :D",
-  "Bana kendimi dünyanın en şanslı insanı gibi hissettirmen.",
-  "Başımı omzuna koyduğumda zamanın durması.",
-  "Bana 'biz' olmanın 'ben' olmaktan çok daha güzel olduğunu öğretmen.",
-  "Kusurlarımı bile sevilecek bir şeye dönüştürmen.",
-  "En yorgun günümde bile beni tek bir cümlenle dinlendirebilmen."
 ]
   const flowerEmojis = ["🌸", "🌹", "🌷", "🌺", "🌻"];
   const totalFlowerCount = (dreams?.filmler?.length || 0) + (dreams?.yerler?.length || 0) + (dreams?.aktiviteler?.length || 0);
@@ -1307,7 +1269,7 @@ function App() {
           fontStyle: 'italic',
           marginBottom: '20px' 
         }}>
-          📍 İlk an... O günkü heyecanımız hala taze. ❤️
+          📍 İlk an... ❤️
         </p>
       </div>
 
@@ -1398,11 +1360,8 @@ function App() {
           {stressStatus === 'uzgun' ? (
             <>
               <img src="/uzgun.jpeg" alt="Yanındayım" style={{ width: '100%', borderRadius: '25px', marginBottom: '20px', boxShadow: '0 10px 20px rgba(0,0,0,0.1)' }} />
-              <p style={{ fontSize: '18px', color: '#444', lineHeight: '1.7', fontFamily: 'Quicksand' }}>
-                Dünyanın yükü bazen ağır gelebilir ama unutma ki senin güvenli yuvan benim, benim yanım... 
-                Gözlerini kapat, derin bir nefes al ve benim her zaman senin arkanda, 
-                her zaman senin yanında olduğumu hatırla. Sen benim güçlü tunişimsin ve 
-                biz seninle birlikte her şeyi hallederiz. Seni çok seviyorum sevgilim. ❤️
+              <p style={{ fontSize: '18px', color: '#444', lineHeight: '1.7', fontFamily: 'Quicksand' }}> 
+                Seni çok seviyorum sevgilim. ❤️
               </p>
             </>
           ) : (
@@ -1410,8 +1369,6 @@ function App() {
               <img src="/mutlu.jpeg" alt="Mutluluğumuz" style={{ width: '100%', borderRadius: '25px', marginBottom: '20px', boxShadow: '0 10px 20px rgba(248, 47, 141, 0.2)' }} />
               <p style={{ fontSize: '18px', color: '#444', lineHeight: '1.7', fontFamily: 'Quicksand' }}>
                 Senin o güzel enerjin ve gülüşün benim en büyük huzur kaynağım...
-                Sen mutlu olduğunda benim içimde çiçekler açıyor. Mutluluğun asla bitmesin. 
-                Sen gülümsediğinde benim dünyam çok daha güzel bir yer oluyor herşeyimm .❤️
               </p>
             </>
           )}
@@ -1528,19 +1485,13 @@ function App() {
 
       <div style={{ textAlign: 'left', lineHeight: '1.8', fontFamily: 'Quicksand', color: '#444', fontSize: '16px' }}>
         <p> 
-          Sana olan hislerimi kelimelere dökmek her zaman zor ama hatırlatmak istiyorum ki; sen benim hayatımın en değerli varlığı ve en huzurlu limanısın.
-        </p>
-        <p> 
-          Zorlandığımda arkamdaki o koca dağ, güldüğümde çocuksu sevincimsin.
-        </p>
-        <p>
-          Hayat bazen karmaşık, bazen yorucu olabilir ama senin ellerini tuttuğum sürece her şeyi halledebileceğimizi biliyorum. 
+         sen benim hayatımın en değerli varlığısın
           İyi ki benimlesin, iyi ki biz olduk...
         </p>
         <br />
         <p style={{ textAlign: 'right', fontWeight: 'bold', color: '#f82f8d', fontSize: '18px', fontFamily: 'Dancing Script' }}>
-          Seni ruhunun her zerresine kadar çok seven,<br />
-          Aysun. ❤️
+          Seni çok seven,<br />
+          
         </p>
       </div>
 
