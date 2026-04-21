@@ -25,7 +25,7 @@ const placeholderImages = [
   resim5, resim6, resim7, resim8
 ];
 // --- SUNUCU ADRESİ ---
-const API_BASE_URL = "https://aystun.onrender.com";
+const API_BASE_URL = "https://your-render-app.onrender.com";
 
 const HafizaOyunu = ({ onComplete }) => {
   const [cards, setCards] = useState([]);
@@ -431,7 +431,7 @@ const KalpYakala = ({ onComplete }) => {
   );
 };
 // --- AYSUN TARLASI (MAYIN TARLASI) ---
-const AYSUN_CONFIG = {
+const [SEVGILININ_ADI]_CONFIG = \{
   EASY: { 
     size: 8, mines: 8, label: "Sakin Aysun", 
     messages: ["Peki...", "Anladım.", "Sen bilirsin.", "Hmm.", "Tamam."] 
