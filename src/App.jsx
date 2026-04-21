@@ -4,20 +4,24 @@ import {  Heart, MapPin, Smile, MessageCircle, Lock, ExternalLink, Globe, Film, 
 import confetti from 'canvas-confetti';
 
 // --- GÖRSELLER (WEBP VE PNG) ---
+// NOT: Bu resimleri kendi resimlerinizle değiştirin
+// Kurdeleli kalp görseli için kendi resminizi koyun
 import KurdeleliKalpGorseli from './assets/kurdeleli_kalp.png';
-import SenNormal from './assets/sen_normal.webp'; 
-import SenYakala from './assets/sen_yakala.webp';
-import DusenKafa from './assets/dusen_kafa.webp';
-// Resimlerini bu şekilde dosyanın başına import et
-import resim1 from './assets/resim1.jpeg';
-import resim2 from './assets/resim2.jpeg';
-import resim3 from './assets/resim3.jpeg';
-import resim4 from './assets/resim4.jpeg';
-import resim5 from './assets/resim5.jpeg';
-import resim6 from './assets/resim6.jpeg';
-import resim7 from './assets/resim7.jpeg';
-import resim8 from './assets/resim8.jpeg';
-import myImage from './assets/resim.jpeg';
+// Karakter resimleri için kendi resimlerinizi koyun
+// import SenNormal from './assets/sen_normal.webp'; 
+// import SenYakala from './assets/sen_yakala.webp';
+// import DusenKafa from './assets/dusen_kafa.webp';
+// Hafıza oyunu resimleri için 8 adet kendi resminizi koyun
+// import resim1 from './assets/resim1.jpeg';
+// import resim2 from './assets/resim2.jpeg';
+// import resim3 from './assets/resim3.jpeg';
+// import resim4 from './assets/resim4.jpeg';
+// import resim5 from './assets/resim5.jpeg';
+// import resim6 from './assets/resim6.jpeg';
+// import resim7 from './assets/resim7.jpeg';
+// import resim8 from './assets/resim8.jpeg';
+// Yapboz için kendi resminizi koyun
+// import myImage from './assets/resim.jpeg';
 
 // Diziyi artık bu değişkenlerle oluşturuyoruz
 const placeholderImages = [
@@ -214,7 +218,7 @@ const Yapboz = ({ onComplete }) => {
 
   useEffect(() => {
     const img = new Image();
-    img.src = myImage;
+    // img.src = myImage; // Kendi resminizi buraya koyun
     img.onload = () => {
       const ratio = img.width / img.height;
       // Parça boyutlarını ekranın genişliğine göre dinamik hesapla (örneğin parça başı 120-150px)
@@ -1567,3 +1571,6 @@ function App() {
 }
 
 export default App;
+
+
+
